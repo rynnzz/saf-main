@@ -16,7 +16,8 @@
             <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
 
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
+                class="mx-2"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -113,9 +114,66 @@
       </q-header>
 
       <q-page class="body">
+        <div align="center" style="margin: 20px;">
+          <h2>Contacts</h2>
+        </div>
+        <div align="center">
+          <q-card dark bordered class="bg-grey-10 my-card" align="left"
+            style="height: 100%; width: 700px; overflow-y: auto; margin: 50px;">
+            <q-separator dark style="margin: 10px;" />
+            <div>
+              <div v-for="contact in computedContacts.slice().reverse()" :key="contact.id">
+                <p style="margin: 15px; font-size: 20px;">{{ contact.content }}</p><br>
+                <p align="right" style="margin: 10px; font-size: 20px;">Date Posted: {{ contact.date }}</p>
+
+                <q-btn v-if="userType === 'admin'" @click="editContact(contact)" color="orange"
+                  style="margin: 20px; align-items: center; border-radius: 15px;">Edit</q-btn>
+                <q-btn v-if="userType === 'admin'" @click="deleteContact(contact)" color="danger"
+                  style="align-items: center; border-radius: 15px;">Delete</q-btn>
+                <q-separator dark style="margin: 10px;" />
+              </div>
+            </div>
+          </q-card>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
+  <q-dialog v-model="isDeleteConfirmationModalVisible" persistent>
+    <q-card class="custom-card" style="width: 100vw">
+      <q-card-section>
+        <h2 class="text-h6">Confirm Deletion</h2>
+      </q-card-section>
+
+      <q-card-section>
+        <p>Are you sure you want to delete this announcement?</p>
+      </q-card-section>
+
+      <q-card-actions align="right" style="margin: 20px;">
+        <q-btn color="primary" @click="cancelDelete"
+          style="align-items: center; margin-right: 10px; border-radius: 15px;"> Cancel </q-btn>
+        <q-btn color="negative" @click="confirmDelete" style="align-items: center; border-radius: 15px;"> Delete </q-btn>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+  <q-dialog v-model="isEditModalVisible" persistent>
+    <q-card class="custom-card" style="width: 300vw;">
+      <q-card-section>
+        <h2 class="text-h6">Edit Contact</h2>
+      </q-card-section>
+
+      <q-card-section>
+        <textarea v-model="editedContact.content" placeholder="Contact" class="compose"> </textarea>
+        <input type="date" v-model="editedContact.date" class="date" />
+      </q-card-section>
+
+      <q-card-actions align="right" style="margin: 20px;">
+        <q-btn label="Cancel" color="primary" @click="cancelEdit"
+          style="align-items: center; margin-right: 10px; border-radius: 15px;" />
+        <q-btn label="Save Changes" color="positive" @click="saveChanges"
+          style="align-items: center; width: 160px; border-radius: 15px;" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -126,8 +184,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 export default {
   data() {
     return {
-      activeTab: 'ContactsComponent'
-    }
+      activeTab: 'ContactsComponent',
+      isDeleteConfirmationModalVisible: false,
+      contacts: [],
+      isEditModalVisible: false,
+      contactToDeleteId: null,
+      editedContact: {
+        id: '',
+        content: '',
+        date: ''
+      },
+    };
+  },
+  created() {
+    this.getContacts()
   },
   methods: {
     setActiveTab(ContactsComponent) {
@@ -135,16 +205,166 @@ export default {
     },
     logout() {
       simulateLogout()
-      this.$router.push({ name: 'LoginComponent' })
+      this.$router.push({ name: 'LoginComponent' });
     },
+    async getContacts() {
+      try {
+        const response = await fetch('http://localhost/api/contacts.php?action=getContacts');
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('API Response:', data);
+        this.contacts = data;
+      } catch (error) {
+        console.error('Error fetching contacts', error);
+      }
+    },
+
+    deleteContact(contact) {
+      this.contactToDeleteId = contact.id;
+      this.isDeleteConfirmationModalVisible = true;
+    },
+
+    cancelDelete() {
+      this.isDeleteConfirmationModalVisible = false;
+    },
+
+    async confirmDelete() {
+      try {
+        console.log('Deleting contact with ID:', this.contactToDeleteId);
+        // Make a request to delete the announcement
+        const response = await fetch('http://localhost/api/contact.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'deleteContact',
+            id: this.contactToDeleteId,
+            category: this.contacts.find(a => a.id === this.contactToDeleteId).category,
+          }),
+        });
+        console.log('Response:', response);
+        if (response.ok) {
+          // Remove the deleted announcement from the local data
+          this.contacts = this.contacts.filter(a => a.id !== this.contactToDeleteId);
+
+          // Reset variables
+          this.contactToDeleteId = null;
+          this.isDeleteConfirmationModalVisible = false;
+        } else {
+          // Handle error response
+          try {
+            const errorMessage = await response.json();
+            console.error('Error deleting contact:', errorMessage);
+          } catch (error) {
+            console.error('Error deleting contact', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error deleting contact', error);
+      }
+    },
+
+    editContact(contact) {
+      this.editedContact = {
+        id: contact.id,
+        content: contact.content,
+        date: new Date(contact.date).toISOString().slice(0, 10),
+      };
+      this.contactToDeleteId = contact.id;
+      this.isEditModalVisible = true;
+    },
+
+
+    cancelEdit() {
+      this.editedContact.id = null;
+      this.editedContact.content = '';
+      this.editedContact.date = '',
+        this.contactToDeleteId = null;
+      this.isEditModalVisible = false;
+    },
+
+    async saveChanges() {
+      try {
+        const editedDate = new Date(this.editedContact.date);
+        const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
+
+
+
+        const response = await fetch('http://localhost/api/contact.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'updateContact',
+            id: this.editedContact.id,
+            content: this.editedContact.content,
+            date: formattedDate,
+            category: this.contacts.find(a => a.id === this.editedContact.id)?.category || 'Contacts',
+          }),
+        });
+
+
+        if (response.ok) {
+
+          const index = this.contacts.findIndex(a => a.id === this.editedContact.id);
+          if (index !== -1) {
+            this.contacts.splice(index, 1, {
+              id: this.editedContact.id,
+              content: this.editedContact.content,
+              date: this.editedContact.date,
+            });
+          }
+          this.editedContact.id = null;
+
+          this.isEditModalVisible = false;
+        } else {
+          try {
+            const errorMessage = await response.json();
+            console.error('Error updating contact:', errorMessage);
+          } catch (error) {
+            console.error('Error updating contact', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error updating contact', error);
+      }
+    }
+
   },
   computed: {
     userType() {
       return localStorage.getItem('userType')
-    }
-  }
+    },
+    computedContacts() {
+      return this.contacts.map(contact => {
+        // Format the date using the Date object
+        const formattedDate = new Date(contact.date).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        });
+
+
+        // Return the announcement with the formatted date
+        return {
+          ...contact,
+          date: formattedDate,
+        };
+      }).slice().reverse();
+    },
+
+  },
 }
+
 </script>
+
 
 <style scoped>
 @import './css/contacts.css'

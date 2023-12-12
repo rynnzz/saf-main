@@ -13,12 +13,18 @@ img {
   flex-direction: column;
 }
 
-
 .header {
   background-color: #1f1f1f;
   color: white;
   width: 100%;
   font-family: 'Product Sans Black', sans-serif;
+}
+
+.custom-card {
+  background-color: #292a2d;
+  margin: 0;
+  font-family: 'Product Sans', sans-serif;
+  color: white;
 }
 
 .nav-bar {
@@ -38,4 +44,5 @@ img {
   background-color: #595959;
   color: #ebebeb;
   border-radius: 10px;
+
 }

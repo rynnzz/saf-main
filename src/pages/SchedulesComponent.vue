@@ -118,15 +118,12 @@
         </div>
         <div align="center">
           <q-card dark bordered class="bg-grey-10 my-card" align="left"
-            style="height: 430px; width: 700px; overflow-y: auto; margin: 20px;">
-            <q-card-section>
-              <h4>Recent Schedules</h4>
-            </q-card-section>
+            style="height: 100%; width: 700px; margin: 20px;">
             <q-separator dark style="margin: 10px;" />
             <div>
               <div v-for="schedule in computedSchedules.slice().reverse()" :key="schedule.id">
                 <p style="margin: 15px; font-size: 20px;">{{ schedule.content }}</p>
-                <p align="right" style="margin: 10px; font-size: 20px;">{{ schedule.date }}</p>
+                <p align="right" style="margin: 10px; font-size: 20px;">Date Posted: {{ schedule.date }}</p>
 
                 <q-btn v-if="userType === 'admin'" @click="editSchedule(schedule)" color="orange"
                   style="margin: 20px; align-items: center;">Edit</q-btn>
@@ -272,7 +269,7 @@ export default {
       this.editedSchedule = {
         id: schedule.id,
         content: schedule.content,
-        date: schedule.date,
+        date: new Date(schedule.date).toISOString().slice(0, 10),
       };
       this.isEditModalVisible = true;
     },
@@ -284,6 +281,8 @@ export default {
     },
 
     async saveChanges() {
+      const editedDate = new Date(this.editedSchedule.date);
+        const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
       try {
         const response = await fetch('http://localhost/api/schedule.php', {
           method: 'POST',
@@ -294,7 +293,7 @@ export default {
             action: 'updateSchedule',
             id: this.editedSchedule.id,
             content: this.editedSchedule.content,
-            date: this.editedSchedule.date,
+            date: formattedDate,
             category: this.schedules.find(a => a.id === this.editedSchedule.id)?.category || 'Schedule',
           }),
         });
@@ -310,7 +309,7 @@ export default {
               date: this.editedSchedule.date,
             });
           }
-
+          this.editedSchedule.id = null;
           this.isEditModalVisible = false;
         } else {
           try {
@@ -333,12 +332,16 @@ export default {
     },
     computedSchedules() {
       return this.schedules.map(schedule => {
+        // Format the date using the Date object
         const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
+          timeZone: 'UTC',
         });
 
+
+        // Return the announcement with the formatted date
         return {
           ...schedule,
           date: formattedDate,

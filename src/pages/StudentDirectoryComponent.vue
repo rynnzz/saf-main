@@ -109,15 +109,18 @@
         <table class="table table-bordered table-striped">
           <tr>
             <th>Name</th>
-            <th>Course, Year, And section</th>
-            <th>Action</th>
+            <th>Course, Year, And Section</th>
+            <th>View Profile</th>
+            <th>Status</th>
           </tr>
           <tr v-for="user in filteredUsers.length ? filteredUsers : users" :key="user.id_num">
             <td>{{ user.lname }} , {{ user.fname }}</td>
             <td>{{ user.course }} {{ user.yr_and_sec }}</td>
             <td><q-btn type="button"
                 style="  padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 20px; color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 160px; align-items: center;"
-                label="View Details" @click="viewDetails(user)" /> </td>
+                label="View Details" @click="viewDetails(user)" />
+            </td>
+            <td>Dropped</td>
           </tr>
         </table>
         <q-dialog v-model="viewDetailsModal">

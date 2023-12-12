@@ -119,15 +119,12 @@
         </div>
         <div align="center">
           <q-card dark bordered class="bg-grey-10 my-card" align="left"
-            style="height: 100%; width: 700px; overflow-y: auto; margin: 50px;">
-            <q-card-section>
-              <h4>Recent Announcements</h4>
-            </q-card-section>
+            style="height: 100%; width: 700px; margin: 50px;">
             <q-separator dark style="margin: 10px;" />
             <div>
               <div v-for="announcement in computedAnnouncements.slice().reverse()" :key="announcement.id">
-                <p style="margin: 15px; font-size: 20px;">{{ announcement.content }}</p>
-                <p align="right" style="margin: 10px; font-size: 20px;">{{ announcement.date }}</p>
+                <p style="margin: 15px; font-size: 20px;">{{ announcement.content }}</p><br>
+                <p align="right" style="margin: 10px; font-size: 20px;">Date Posted: {{ announcement.date }}</p>
 
                 <q-btn v-if="userType === 'admin'" @click="editAnnouncement(announcement)" color="orange"
                   style="margin: 20px; align-items: center; border-radius: 15px;">Edit</q-btn>
