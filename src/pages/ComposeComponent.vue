@@ -4,12 +4,14 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" color="purple" icon="person"
               style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Admin" />
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
+                class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -97,12 +99,12 @@
 
       <q-page class="body">
         <div align="center" style="margin: 20px;">
-          <h2>Administrator Compose Page</h2>
+          <h2 style="font-family: 'Product Sans Medium', sans-serif;">Administrator Compose Page</h2>
         </div>
         <div align="center">
           <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 430px; width: 700px">
             <q-card-section>
-              <h5>Compose</h5>
+              <h5 style="font-family: 'Product Sans Medium', sans-serif;">Compose</h5>
             </q-card-section>
             <q-separator dark style="margin: 10px;" />
             <q-card-section class="q-pt-none text-h6">
@@ -119,7 +121,7 @@
             <input v-model="date" type="date" placeholder="Date Posted" id="date" class="date" name="date">
           </q-card>
           <q-btn @click="postContent" color="blue"
-            style="margin-top: 30px; width: 140px; font-family: 'Product-Sans Medium', sans-serif;"><i class="mx-2"><svg
+            style="margin-top: 30px; width: 140px; font-family: 'Product Sans Black', sans-serif;"><i class="mx-2"><svg
                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-rocket-takeoff-fill" viewBox="0 0 16 16">
                 <path
@@ -131,6 +133,21 @@
       </q-page>
     </q-page-container>
   </q-layout>
+  <q-dialog v-model="showDialog" @hide="clearDialog">
+          <div class="compose-dialog" style="width: 500px;">
+            <q-card-section>
+              <h5>Content Posted</h5>
+              <q-separator dark />
+            </q-card-section>
+            <q-card-section>
+              <p>The Content has been posted successfully.</p>
+            </q-card-section>
+            <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+              <q-btn type="button" @click="showDialog = false"
+                style="margin-right: 10px; border-radius: 20px; padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans medium', sans-serif;">CLOSE</q-btn>
+            </div>
+          </div>
+        </q-dialog>
 </template>
 
 <script>
@@ -145,7 +162,8 @@ export default {
       activeTab: 'ComposeComponent',
       content: '',
       date: '',
-      selectedCategory: ''
+      selectedCategory: '',
+      showDialog: false
     };
   },
   methods: {
@@ -158,11 +176,8 @@ export default {
     },
     async postContent() {
       if (!this.selectedCategory || !this.content || !this.date) {
-        // Validate that all required fields are filled
         return;
       }
-
-      // Format the date to 'yyyy-MM-dd'
       const formattedDate = new Date(this.date).toISOString().split('T')[0];
 
       const post = { content: this.content, date: formattedDate, category: this.selectedCategory };
@@ -177,13 +192,11 @@ export default {
         });
 
         if (response.ok) {
-          // Handle the response as needed
           const data = await response.json();
           console.log(data);
-
-          // Clear the form after successful submission
           this.content = '';
           this.date = '';
+          this.showDialog = true;
         } else {
           console.error('Error posting content:', response.statusText);
         }
@@ -191,13 +204,24 @@ export default {
         console.error('Error posting content:', error);
       }
     },
+    clearDialog() {
+      this.showDialog = false;
+    }
 
   },
   computed: {
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
-  }
+  },
+  beforeRouteEnter(to, from, next) {
+      const userType = sessionStorage.getItem('userType');
+      if (userType !== 'admin') {
+        next({ name: 'HomeComponent' });
+      } else {
+        next();
+      }
+    },
 }
 </script>
 

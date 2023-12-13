@@ -2,10 +2,12 @@
   <q-layout>
     <q-page-container>
       <q-header elevated class="header">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
@@ -16,7 +18,8 @@
             <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
 
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
+                class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -135,21 +138,21 @@
           </q-card>
         </div>
         <div class="column">
-          <q-card class="my-card bg-grey-10"
+          <q-card dark bordered class="bg-grey-10 my-card"
             style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); width: 390px; height: 450px;">
             <q-card-section>
               <div class="text-h6">Upcoming Events</div>
               <q-separator dark />
-                <div v-for="event in computedEvents.slice().reverse()" :key="event.id">
-                  <p style="margin: 15px; font-size: 20px;">{{ event.content }}</p>
-                  <p align="right" style="margin: 10px; font-size: 20px;">{{ event.date }}</p>
+              <div v-for="event in computedEvents.slice().reverse()" :key="event.id">
+                <p style="margin: 15px; font-size: 20px;">{{ event.content }}</p>
+                <p align="right" style="margin: 10px; font-size: 20px;">{{ event.date }}</p>
 
-                  <q-btn v-if="userType === 'admin'" @click="editEvent(event)" color="orange"
-                    style="margin: 20px; align-items: center;">Edit</q-btn>
-                  <q-btn v-if="userType === 'admin'" @click="deleteEvent(event)" color="danger"
-                    style="align-items: center;">Delete</q-btn>
-                  <q-separator dark style="margin: 10px;" />
-                  </div>
+                <q-btn v-if="userType === 'admin'" @click="editEvent(event)" color="orange"
+                  style="margin: 20px; align-items: center;">Edit</q-btn>
+                <q-btn v-if="userType === 'admin'" @click="deleteEvent(event)" color="danger"
+                  style="align-items: center;">Delete</q-btn>
+                <q-separator dark style="margin: 10px;" />
+              </div>
             </q-card-section>
             <q-card-section>
             </q-card-section>
@@ -225,140 +228,156 @@ export default {
       this.$router.push({ name: 'LoginComponent' })
     },
     async getEvents() {
-    try {
-      const response = await fetch('http://localhost/api/event.php?action=getEvents');
+      try {
+        const response = await fetch('http://localhost/api/event.php?action=getEvents');
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('API Response:', data);
-      this.events = data;
-    } catch (error) {
-      console.error('Error fetching Events', error);
-    }
-  },
-
-
-  deleteEvent(event) {
-    this.eventToDeleteId = event.id;
-    this.isDeleteConfirmationModalVisible = true;
-  },
-
-  async confirmDelete() {
-    try {
-      console.log('Deleting event with ID:', this.eventToDeleteId);
-      // Make a request to delete the announcement
-      const response = await fetch('http://localhost/api/event.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'deleteEvents',
-          id: this.eventToDeleteId,
-          category: this.events.find(a => a.id === this.eventToDeleteId).category,
-        }),
-      });
-      console.log('Response:', response);
-      if (response.ok) {
-
-        this.events = this.events.filter(a => a.id !== this.eventToDeleteId);
-
-        this.eventToDeleteId = null;
-        this.isDeleteConfirmationModalVisible = false;
-      } else {
-        try {
-          const errorMessage = await response.json();
-          console.error('Error deleting event:', errorMessage);
-        } catch (error) {
-          console.error('Error deleting event', error);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
+        const data = await response.json();
+        console.log('API Response:', data);
+        this.events = data;
+      } catch (error) {
+        console.error('Error fetching Events', error);
       }
-    } catch (error) {
-      console.error('Error deleting event', error);
-    }
-  },
-
-  editEvent(event) {
-    this.editedEvent = {
-      id: event.id,
-      content: event.content,
-      date: event.date,
-    };
-    this.isEditModalVisible = true;
-  },
-  cancelEdit() {
-    this.editedEvent.id = null;
-    this.editedEvent.content = '';
-    this.editedEvent.date = ''
-    this.isEditModalVisible = false;
-  },
-
-  async saveChanges() {
-    try {
-      const response = await fetch('http://localhost/api/event.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'updateEvent',
-          id: this.editedEvent.id,
-          content: this.editedEvent.content,
-          date: this.editedEvent.date,
-          category: this.events.find(a => a.id === this.editedEvent.id).category,
-        }),
-      });
+    },
 
 
-      if (response.ok) {
+    deleteEvent(event) {
+      this.eventToDeleteId = event.id;
+      this.isDeleteConfirmationModalVisible = true;
+    },
+    cancelDelete() {
+      this.isDeleteConfirmationModalVisible = false;
+    },
 
-        const index = this.events.findIndex(a => a.id === this.editedEvent.id);
-        if (index !== -1) {
-          this.events.splice(index, 1, {
+    async confirmDelete() {
+      try {
+        console.log('Deleting event with ID:', this.eventToDeleteId);
+        const response = await fetch('http://localhost/api/event.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'deleteEvents',
+            id: this.eventToDeleteId,
+            category: this.events.find(a => a.id === this.eventToDeleteId).category,
+          }),
+        });
+        console.log('Response:', response);
+        if (response.ok) {
+
+          this.events = this.events.filter(a => a.id !== this.eventToDeleteId);
+
+          this.eventToDeleteId = null;
+          this.isDeleteConfirmationModalVisible = false;
+        } else {
+          try {
+            const errorMessage = await response.json();
+            console.error('Error deleting event:', errorMessage);
+          } catch (error) {
+            console.error('Error deleting event', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error deleting event', error);
+      }
+    },
+
+    editEvent(event) {
+      this.editedEvent = {
+        id: event.id,
+        content: event.content,
+        date: new Date(event.date).toISOString().slice(0, 10),
+      };
+      this.isEditModalVisible = true;
+    },
+    cancelEdit() {
+      this.editedEvent.id = null;
+      this.editedEvent.content = '';
+      this.editedEvent.date = ''
+      this.isEditModalVisible = false;
+    },
+
+    async saveChanges() {
+      const editedDate = new Date(this.editedEvent.date);
+      const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
+      try {
+        const response = await fetch('http://localhost/api/event.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'updateEvent',
             id: this.editedEvent.id,
             content: this.editedEvent.content,
-            date: this.editedEvent.date,
-          });
-        }
+            date: formattedDate,
+            category: this.events.find(a => a.id === this.editedEvent.id)?.category || 'Event',
+          }),
+        });
 
-        this.isEditModalVisible = false;
-      } else {
-        try {
-          const errorMessage = await response.json();
-          console.error('Error updating event:', errorMessage);
-        } catch (error) {
-          console.error('Error updating event', error);
+
+        if (response.ok) {
+
+          const index = this.events.findIndex(a => a.id === this.editedEvent.id);
+          if (index !== -1) {
+            this.events.splice(index, 1, {
+              id: this.editedEvent.id,
+              content: this.editedEvent.content,
+              date: this.editedEvent.date,
+            });
+          }
+          this.editedEvent.id = null;
+          this.isEditModalVisible = false;
+        } else {
+          try {
+            const errorMessage = await response.json();
+            console.error('Error updating event:', errorMessage);
+          } catch (error) {
+            console.error('Error updating event', error);
+          }
         }
+      } catch (error) {
+        console.error('Error updating event', error);
       }
-    } catch (error) {
-      console.error('Error updating event', error);
-    }
+    },
   },
-  cancelDelete() {
-    this.isDeleteConfirmationModalVisible = false;
-  },
-},
 
   computed: {
     userFirstName() {
-      return localStorage.getItem('userFirstName')
+      const userData = sessionStorage.getItem('userData');
+      const userType = sessionStorage.getItem('userType');
+
+      if (userData && userType) {
+        const userObject = JSON.parse(userData);
+
+        if (userType === 'admin') {
+          return userObject.username;
+        }
+        else if (userType === 'teacher') {
+          return userObject.username;
+        } else {
+          return userObject.fname;
+        }
+      }
+
+      return null;
     },
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
     computedEvents() {
       return this.events.map(event => {
-        // Format the date using the Date object
         const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
+          timeZone: 'UTC',
         });
 
-        // Return the ``announcement`` with the formatted date
         return {
           ...event,
           date: formattedDate,

@@ -19,6 +19,15 @@ img {
   margin: 30px;
   width: 95vw;
 }
+.update-dialog {
+  background-color: #292a2d;
+  height: 200px;
+  margin: 0;
+  font-family: 'Product Sans', sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
 
 
 .header {

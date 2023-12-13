@@ -4,8 +4,9 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
@@ -16,7 +17,8 @@
             <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
 
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
+                class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -117,8 +119,7 @@
           <h2>Schedules</h2>
         </div>
         <div align="center">
-          <q-card dark bordered class="bg-grey-10 my-card" align="left"
-            style="height: 100%; width: 700px; margin: 20px;">
+          <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 100%; width: 700px; margin: 20px;">
             <q-separator dark style="margin: 10px;" />
             <div>
               <div v-for="schedule in computedSchedules.slice().reverse()" :key="schedule.id">
@@ -231,7 +232,6 @@ export default {
     async confirmDelete() {
       try {
         console.log('Deleting schedule with ID:', this.scheduleToDeleteId);
-        // Make a request to delete the announcement
         const response = await fetch('http://localhost/api/schedule.php', {
           method: 'POST',
           headers: {
@@ -245,14 +245,11 @@ export default {
         });
         console.log('Response:', response);
         if (response.ok) {
-          // Remove the deleted announcement from the local data
           this.schedules = this.schedules.filter(a => a.id !== this.scheduleToDeleteId);
 
-          // Reset variables
           this.scheduleToDeleteId = null;
           this.isDeleteConfirmationModalVisible = false;
         } else {
-          // Handle error response
           try {
             const errorMessage = await response.json();
             console.error('Error deleting schedule:', errorMessage);
@@ -282,7 +279,7 @@ export default {
 
     async saveChanges() {
       const editedDate = new Date(this.editedSchedule.date);
-        const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
+      const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
       try {
         const response = await fetch('http://localhost/api/schedule.php', {
           method: 'POST',
@@ -328,20 +325,16 @@ export default {
   },
   computed: {
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
     computedSchedules() {
       return this.schedules.map(schedule => {
-        // Format the date using the Date object
         const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
           timeZone: 'UTC',
         });
-
-
-        // Return the announcement with the formatted date
         return {
           ...schedule,
           date: formattedDate,
@@ -351,9 +344,7 @@ export default {
 
   },
 }
-
 </script>
-
 
 <style scoped>
 @import './css/schedule.css'

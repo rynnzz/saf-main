@@ -9,10 +9,6 @@ body {
   font-family: 'Product Sans', sans-serif;
 }
 
-.btn {
-  width: 100px;
-}
-
 .id,
 .fname,
 .mname,
@@ -36,6 +32,8 @@ body {
   transition: border 0.15s ease 0s;
   width: 500px;
   font-family: 'Product Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 header {
@@ -47,6 +45,7 @@ header {
   justify-content: left;
   width: 100%;
   height: 150px;
+  font-family: 'Product Sans Black', sans-serif;
 }
 
 h1 {
@@ -56,8 +55,7 @@ h1 {
 
 h2 {
   color: white;
-  padding: 10px;
-  text-align: center;
+  padding: 20px;
 }
 
 header img {
@@ -74,12 +72,15 @@ header img {
   align-items: center;
   width: 700px;
   box-shadow: 0 25.6px 57.6px 0 rgb(0 0 0 / 22%), 0 4.8px 14.4px 0 rgb(0 0 0 / 18%);
+  height: 70%;
+  margin: 30px;
 }
 
 form {
   align-items: center;
   text-align: center;
   color: white;
+
 }
 
 .custom-card {

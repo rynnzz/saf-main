@@ -4,8 +4,9 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
               style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
@@ -104,25 +105,42 @@
           <h2>Student Information Catalogue</h2>
         </div>
         <div align="center" style="margin: 10px;">
-      <input v-model="searchQuery" @input="search" type="search" class="search-bar" placeholder="Enter Name, Course or Year and Section">
-    </div>
-        <table class="table table-bordered table-striped">
-          <tr>
-            <th>Name</th>
-            <th>Course, Year, And Section</th>
-            <th>View Profile</th>
-            <th>Status</th>
-          </tr>
-          <tr v-for="user in filteredUsers.length ? filteredUsers : users" :key="user.id_num">
-            <td>{{ user.lname }} , {{ user.fname }}</td>
-            <td>{{ user.course }} {{ user.yr_and_sec }}</td>
-            <td><q-btn type="button"
-                style="  padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 20px; color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 160px; align-items: center;"
-                label="View Details" @click="viewDetails(user)" />
-            </td>
-            <td>Dropped</td>
-          </tr>
-        </table>
+          <input v-model="searchQuery" @input="search" type="search" class="search-bar"
+            placeholder="Enter Name, Course or Year and Section">
+        </div>
+        <div v-if="filteredUsers.length > 0 || searchQuery === ''">
+          <table class="table table-bordered table-striped" style="font-family: 'Product Sans', sans-serif;">
+            <tr>
+              <th>Name</th>
+              <th>Course, Year, And Section</th>
+              <th>View Profile</th>
+              <th v-if="userType === 'admin'">Update Status</th>
+            </tr>
+            <tr v-for="user in filteredUsers.length ? filteredUsers : users" :key="user.id_num"
+              style="font-family: 'Product Sans Medium', sans-serif;">
+              <td>{{ user.lname }} , {{ user.fname }}</td>
+              <td>{{ user.course }} {{ user.yr_and_sec }}</td>
+              <td><q-btn type="button"
+                  style="padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 20px; color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 160px; align-items: center;"
+                  label="View Details" @click="viewDetails(user)" />
+              </td>
+              <td v-if="userType === 'admin'">
+                <select v-model="user.status" id="status"
+                  style="width: 250px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 10px; color: rgb(247, 248, 248); height: 46px;">
+                  <option value="" selected disabled>Status</option>
+                  <option value="Enrolled">Enrolled</option>
+                  <option value="Dropped">Dropped</option>
+                  <option value="Graduated">Graduated</option>
+                </select>
+                <q-btn v-if="userType === 'admin'" type="button" @click="updateStatus(user)"
+                  style="padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 20px; color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 100px; align-items: center; margin-left: 20px;"
+                  label="Save" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-if="filteredUsers.length === 0 && searchQuery !== ''" style="text-align: center;">No matching students
+          found.</div>
         <q-dialog v-model="viewDetailsModal">
           <div class="custom-card" style="width: 600vw;">
             <q-card-section>
@@ -130,7 +148,7 @@
               <q-separator dark />
             </q-card-section>
             <q-card-section>
-              <div class="text-h6">
+              <div class="text-h6" style="font-family: 'Product Sans Medium', sans-serif;">
                 <p>Name: {{ selectedStudent.fname }} {{ selectedStudent.mname }} {{ selectedStudent.lname }} </p>
                 <p>Course, Year, and Section: {{ selectedStudent.course }} {{ selectedStudent.yr_and_sec }}</p>
                 <p>Address: {{ selectedStudent.address }}</p>
@@ -139,12 +157,28 @@
                 <p>Contact Person's Name: {{ selectedStudent.gname }}</p>
                 <p>Contact Person's Phone Number: {{ selectedStudent.g_cnum }}</p>
                 <p>Student's Phone Number: {{ selectedStudent.s_cnum }}</p>
+                <p>Status: {{ selectedStudent.status }}</p>
               </div>
             </q-card-section>
             <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
               <q-btn type="button" @click="closeViewDetailsModal"
-                style="margin-right: 10px; border-radius: 20px;   padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans medium', sans-serif;">Back
+                style="margin-right: 10px; border-radius: 20px;   padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans Black', sans-serif;">Back
                 to List</q-btn>
+            </div>
+          </div>
+        </q-dialog>
+        <q-dialog v-model="statusUpdateDialog" @hide="clearStatusUpdateDialog">
+          <div class="update-dialog" style="width: 500px; color: white;">
+            <q-card-section>
+              <h5>Status Updated</h5>
+              <q-separator dark />
+            </q-card-section>
+            <q-card-section>
+              <p>The status has been updated successfully.</p>
+            </q-card-section>
+            <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+              <q-btn type="button" @click="statusUpdateDialog = false"
+                style="margin-right: 10px; border-radius: 20px; padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans medium', sans-serif;">CLOSE</q-btn>
             </div>
           </div>
         </q-dialog>
@@ -164,10 +198,16 @@ export default {
     return {
       activeTab: 'StudentDirectoryComponent',
       viewDetailsModal: false,
+      statusUpdateDialog: false,
       searchQuery: '',
       filteredUsers: [],
       selectedStudent: [],
-      users: []
+      users: [],
+      status: '',
+      user: {
+        id_num: '',
+        status: 'Enrolled'
+      }
     };
   },
   created() {
@@ -182,7 +222,6 @@ export default {
       this.$router.push({ name: 'LoginComponent' });
     },
     search() {
-      // Perform the search based on the query
       const query = this.searchQuery.toLowerCase();
       this.filteredUsers = this.users.filter(user =>
         user.fname.toLowerCase().includes(query) ||
@@ -214,7 +253,12 @@ export default {
       try {
         const response = await axios.get('http://localhost/api/getUsersInfo.php');
         if (response.data.success) {
-          this.users = response.data.data;
+          this.users = response.data.data.map(user => {
+            if (!user.status) {
+              user.status = 'Enrolled';
+            }
+            return user;
+          });
         } else {
           console.error('Failed to fetch users:', response.data.message);
         }
@@ -222,12 +266,45 @@ export default {
         console.error('Error fetching users:', error);
       }
     },
+
+    async updateStatus(user) {
+      try {
+        const response = await axios.post('http://localhost/api/updateStatus.php', {
+          id_num: user.id_num,
+          newStatus: user.status,
+        });
+
+        if (response.data.success) {
+          console.log('Status updated successfully');
+          this.showStatusUpdateDialog();
+        } else {
+          console.error('Failed to update status:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+      }
+    },
+    showStatusUpdateDialog() {
+      this.statusUpdateDialog = true;
+    },
+
+    clearStatusUpdateDialog() {
+      this.statusUpdateDialog = false;
+    }
   },
   computed: {
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
-  }
+  },
+  beforeRouteEnter(to, from, next) {
+      const userType = sessionStorage.getItem('userType');
+      if (userType !== 'admin' && userType !== 'teacher') {
+        next({ name: 'HomeComponent' });
+      } else {
+        next();
+      }
+    },
 }
 </script>
 

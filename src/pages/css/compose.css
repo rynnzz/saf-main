@@ -12,6 +12,10 @@ img {
   display: flex;
   flex-direction: column;
 }
+.compose-dialog {
+  color: white;
+  font-family: 'Product Sans Medium', sans-serif;
+}
 
 
 .header {
@@ -67,5 +71,5 @@ img {
   appearance: none;
   transition: border 0.15s ease 0s;
   margin: 20px;
-  font-family: 'Product Sans', sans-serif;
+  font-family: 'Product Sans Medium', sans-serif;
 }

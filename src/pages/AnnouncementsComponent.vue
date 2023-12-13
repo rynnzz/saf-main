@@ -4,11 +4,13 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
-            <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
+            <router-link to="/ViewProfile"> <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary"
+                icon="person" style="width: 180px; border-radius: 10px; margin-right: 15px;"
+                label="Student" /></router-link>
 
             <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
@@ -118,8 +120,7 @@
           <h2>Announcements</h2>
         </div>
         <div align="center">
-          <q-card dark bordered class="bg-grey-10 my-card" align="left"
-            style="height: 100%; width: 700px; margin: 50px;">
+          <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 100%; width: 700px; margin: 50px;">
             <q-separator dark style="margin: 10px;" />
             <div>
               <div v-for="announcement in computedAnnouncements.slice().reverse()" :key="announcement.id">
@@ -235,7 +236,6 @@ export default {
     async confirmDelete() {
       try {
         console.log('Deleting announcement with ID:', this.announcementToDeleteId);
-        // Make a request to delete the announcement
         const response = await fetch('http://localhost/api/announcement.php', {
           method: 'POST',
           headers: {
@@ -249,14 +249,14 @@ export default {
         });
         console.log('Response:', response);
         if (response.ok) {
-          // Remove the deleted announcement from the local data
+
           this.announcements = this.announcements.filter(a => a.id !== this.announcementToDeleteId);
 
-          // Reset variables
           this.announcementToDeleteId = null;
           this.isDeleteConfirmationModalVisible = false;
+
         } else {
-          // Handle error response
+
           try {
             const errorMessage = await response.json();
             console.error('Error deleting announcement:', errorMessage);
@@ -339,20 +339,16 @@ export default {
   },
   computed: {
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
     computedAnnouncements() {
       return this.announcements.map(announcement => {
-        // Format the date using the Date object
         const formattedDate = new Date(announcement.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
           timeZone: 'UTC',
         });
-
-
-        // Return the announcement with the formatted date
         return {
           ...announcement,
           date: formattedDate,

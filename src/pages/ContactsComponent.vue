@@ -4,8 +4,9 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
@@ -235,8 +236,7 @@ export default {
     async confirmDelete() {
       try {
         console.log('Deleting contact with ID:', this.contactToDeleteId);
-        // Make a request to delete the announcement
-        const response = await fetch('http://localhost/api/contact.php', {
+        const response = await fetch('http://localhost/api/contacts.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -249,14 +249,11 @@ export default {
         });
         console.log('Response:', response);
         if (response.ok) {
-          // Remove the deleted announcement from the local data
           this.contacts = this.contacts.filter(a => a.id !== this.contactToDeleteId);
 
-          // Reset variables
           this.contactToDeleteId = null;
           this.isDeleteConfirmationModalVisible = false;
         } else {
-          // Handle error response
           try {
             const errorMessage = await response.json();
             console.error('Error deleting contact:', errorMessage);
@@ -339,20 +336,16 @@ export default {
   },
   computed: {
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     },
     computedContacts() {
       return this.contacts.map(contact => {
-        // Format the date using the Date object
         const formattedDate = new Date(contact.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
           timeZone: 'UTC',
         });
-
-
-        // Return the announcement with the formatted date
         return {
           ...contact,
           date: formattedDate,

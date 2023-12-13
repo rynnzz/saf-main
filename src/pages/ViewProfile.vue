@@ -4,8 +4,9 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
               style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
@@ -114,6 +115,26 @@
       </q-header>
 
       <q-page class="body">
+        <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 600px; width: 700px">
+          <q-card-section>
+            <h2>My Profile</h2>
+          </q-card-section>
+          <q-separator dark />
+          <q-card-section>
+            <div class="text-h6" style="margin: 10px;">
+              <p>ID Number: {{ userData.id_num }}</p>
+              <p>Name: {{ userData.fname }} {{ userData.mname }} {{ userData.lname }} </p>
+              <p>Course, Year, and Section: {{ userData.course }} {{ userData.yr_and_sec }}</p>
+              <p>Address: {{ userData.address }}</p>
+              <p>Birth Date: {{ userData.b_date }}</p>
+              <p>Age: {{ userData.age }}</p>
+              <p>Contact Person's Name: {{ userData.gname }}</p>
+              <p>Contact Person's Phone Number: {{ userData.g_cnum }}</p>
+              <p>Student's Phone Number: {{ userData.s_cnum }}</p>
+              <p>Status: {{ userData.status }}</p>
+            </div>
+          </q-card-section>
+        </q-card>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -129,7 +150,6 @@ export default {
     return {
       activeTab: 'ViewProfile',
       selectedStudent: null,
-      users: []
     }
   },
   methods: {
@@ -143,11 +163,12 @@ export default {
   },
 
   computed: {
-    userFirstName() {
-      return localStorage.getItem('userFirstName')
+    userData() {
+      const userData = sessionStorage.getItem('userData');
+      return userData ? JSON.parse(userData) : null;
     },
     userType() {
-      return localStorage.getItem('userType')
+      return sessionStorage.getItem('userType')
     }
   }
 }

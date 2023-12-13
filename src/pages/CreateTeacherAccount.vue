@@ -4,12 +4,14 @@
       <q-header elevated class="header">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
-          <h2 style="color: #ea4335; margin-right: 10px;">CPC</h2>
-          <h2 style="color: #4285f4;">SAFETY CENTRAL</h2>
+          <h1>
+            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+          </h1>
           <div class="row" style="margin-left: 470px;">
             <q-btn type="button" color="purple" icon="person"
               style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Admin" />
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
+                class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -96,23 +98,31 @@
       </q-header>
 
       <q-page class="body">
-        <q-form @submit="register">
-        <input v-model="username" type="text" id="username" class="username" name="username" placeholder="Username"><br><br>
-        <input v-model="password" type="password" id="password" class="password" name="password"
-          placeholder="Password"><br><br>
-          <q-btn type="submit" color="accent" label="Register" icon="person" style="width: 160px;" />
+        <div class="q-ma-md" style="max-width: 500px; margin: 0 auto;">
+          <h2 class="q-mb-md" align="center" style="margin: 40px;">Create Teacher Account</h2>
+          <q-form @submit="register" class="q-gutter-md">
+            <div v-if="registrationError" class="text-negative" align="center">{{ registrationError }}</div>
+            <input v-model="username" type="text" id="username" class="username" name="username"
+              placeholder="Username"><br><br>
+            <input v-model="password" type="password" id="password" class="password" name="password"
+              placeholder="Password"><br><br>
+            <q-btn type="submit" color="green" label="Create" icon="person" class="q-mt-md"
+              style="width: 30%; margin: 0 auto; display: block; font-family: 'Product Sans Black', sans-serif;" />
           </q-form>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
   <q-dialog v-model="registrationSuccess">
     <q-card class="custom-card" style="width: 700px">
       <q-card-section>
-        <div class="text-h6">Your registration was successful!</div>
-      </q-card-section>
-      <div class="footer">
-        <button type="button" class="btn btn-success" @click="redirectToLogin">Go to Login</button>
+        <div class="text-h6">Creating Teacher Account was successful!</div>
+      </q-card-section><br>
+      <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <q-btn type="button" @click="closeModal"
+          style="margin-right: 10px; border-radius: 20px;   padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans Black', sans-serif;">Close</q-btn>
       </div>
+
     </q-card>
   </q-dialog>
 </template>
@@ -128,7 +138,8 @@ export default {
       activeTab: 'CreateTeacherAccount',
       username: '',
       password: '',
-      registrationSuccess: false
+      registrationSuccess: false,
+      registrationError: null,
     };
   },
   methods: {
@@ -148,6 +159,11 @@ export default {
     },
     async register() {
       try {
+        // Check if username or password is not provided
+        if (!this.username || !this.password) {
+          throw new Error('Username and password are required.');
+        }
+
         const response = await fetch('http://localhost/api/registerteacher.php', {
           method: 'POST',
           headers: {
@@ -157,36 +173,49 @@ export default {
             username: this.username,
             password: this.password,
           })
-        })
+        });
 
-        console.log('Response:', response)
+        console.log('Response:', response);
 
         if (!response.ok) {
-
-          throw new Error('Network response was not ok')
+          throw new Error('Network response was not ok');
         }
 
-        const contentType = response.headers.get('content-type')
+        const contentType = response.headers.get('content-type');
 
         if (contentType && contentType.includes('application/json')) {
-          const responseData = await response.json()
+          const responseData = await response.json();
 
           if (responseData.success) {
-            this.registrationSuccess = true
-
+            this.registrationSuccess = true;
+            this.registrationError = null;
           } else {
-            this.registrationError = responseData.message || 'Unknown error during registration.'
+            if (responseData.errorCode === 'USERNAME_EXISTS') {
+              this.registrationError = 'Username already exists. Please choose a different username.';
+            } else {
+              this.registrationError = responseData.message || 'Unknown error during registration.';
+            }
           }
         } else {
-
-          this.registrationError = 'Invalid response format. Expected JSON.'
+          this.registrationError = 'Invalid response format. Expected JSON.';
         }
       } catch (error) {
-        console.error('Error during registration:', error)
-        this.registrationError = 'An error occurred during registration.'
+        console.error('Error during registration:', error);
+        this.registrationError = 'An error occurred during registration.';
       }
     },
+    closeModal() {
+      this.registrationSuccess = false;
+    },
   },
+  beforeRouteEnter(to, from, next) {
+      const userType = sessionStorage.getItem('userType');
+      if (userType !== 'admin') {
+        next({ name: 'HomeComponent' });
+      } else {
+        next();
+      }
+    },
 }
 </script>
 

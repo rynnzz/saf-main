@@ -93,7 +93,7 @@ const routes = [
       } else {
         next('/');
       }
-    }
+    },
   },
   {
     path: '/CreateTeacherAccount',
