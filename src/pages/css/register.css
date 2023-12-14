@@ -15,7 +15,6 @@ body {
 .lname,
 .address,
 .age,
-.b_date,
 .password,
 .confirm_password,
 .gname,
@@ -34,6 +33,17 @@ body {
   font-family: 'Product Sans', sans-serif;
   display: flex;
   flex-direction: column;
+}
+.b_date{
+  padding: 6px 12px;
+  background: rgb(31, 32, 35);
+  border: 1px solid rgb(60, 63, 68);
+  border-radius: 10px;
+  color: rgb(247, 248, 248);
+  height: 46px;
+  appearance: none;
+  transition: border 0.15s ease 0s;
+  font-family: 'Product Sans', sans-serif;
 }
 
 header {

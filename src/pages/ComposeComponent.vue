@@ -102,7 +102,7 @@
           <h2 style="font-family: 'Product Sans Medium', sans-serif;">Administrator Compose Page</h2>
         </div>
         <div align="center">
-          <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 430px; width: 700px">
+          <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 550px; width: 700px">
             <q-card-section>
               <h5 style="font-family: 'Product Sans Medium', sans-serif;">Compose</h5>
             </q-card-section>
@@ -110,6 +110,7 @@
             <q-card-section class="q-pt-none text-h6">
               <textarea v-model="content" class="compose" placeholder="Compose Announcement/Schedules/Events"></textarea>
             </q-card-section>
+            <div>
             <select v-model="selectedCategory" class="category">
               <option value="" selected disabled>Category</option>
               <option value="Announcement">Announcements</option>
@@ -118,10 +119,24 @@
               <option value="Contacts">Contacts</option>
 
             </select>
-            <input v-model="date" type="date" placeholder="Date Posted" id="date" class="date" name="date">
+            <br>
+            <q-separator dark style="margin: 20px;" />
+            <select v-model="selectedMonth" class="date" style="margin-right: 15px;">
+              <option value="" selected disabled>Month</option>
+              <option v-for="(month, index) in months" :key="index + 1" :value="index + 1">{{ month }}</option>
+            </select>
+            <select v-model="selectedDay" class="date" style="margin-right: 15px;">
+              <option value="" selected disabled>Day</option>
+              <option v-for="day in days" :key="day" :value="day">{{ day }}</option>
+            </select>
+            <select v-model="selectedYear" class="date" style="margin-right: 15px;">
+              <option value="" selected disabled>Year</option>
+              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+            </select>
+            </div>
           </q-card>
           <q-btn @click="postContent" color="blue"
-            style="margin-top: 30px; width: 140px; font-family: 'Product Sans Black', sans-serif;"><i class="mx-2"><svg
+            style="margin: 30px; width: 140px; font-family: 'Product Sans Black', sans-serif;"><i class="mx-2"><svg
                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-rocket-takeoff-fill" viewBox="0 0 16 16">
                 <path
@@ -134,20 +149,20 @@
     </q-page-container>
   </q-layout>
   <q-dialog v-model="showDialog" @hide="clearDialog">
-          <div class="compose-dialog" style="width: 500px;">
-            <q-card-section>
-              <h5>Content Posted</h5>
-              <q-separator dark />
-            </q-card-section>
-            <q-card-section>
-              <p>The Content has been posted successfully.</p>
-            </q-card-section>
-            <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-              <q-btn type="button" @click="showDialog = false"
-                style="margin-right: 10px; border-radius: 20px; padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans medium', sans-serif;">CLOSE</q-btn>
-            </div>
-          </div>
-        </q-dialog>
+    <div class="compose-dialog" style="width: 500px;">
+      <q-card-section>
+        <h5>Content Posted</h5>
+        <q-separator dark />
+      </q-card-section>
+      <q-card-section>
+        <p>The Content has been posted successfully.</p>
+      </q-card-section>
+      <div class="footer" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <q-btn type="button" @click="showDialog = false"
+          style="margin-right: 10px; border-radius: 20px; padding: 6px 12px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); color: rgb(247, 248, 248); appearance: none; transition: border 0.15s ease 0s; width: 150px; align-items: center; font-family: 'Product Sans medium', sans-serif;">CLOSE</q-btn>
+      </div>
+    </div>
+  </q-dialog>
 </template>
 
 <script>
@@ -163,7 +178,16 @@ export default {
       content: '',
       date: '',
       selectedCategory: '',
-      showDialog: false
+      showDialog: false,
+      selectedDay: '',
+      selectedMonth: '',
+      selectedYear: '',
+      days: Array.from({ length: 31 }, (_, i) => i + 1),
+      months: [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ],
+      years: Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i),
     };
   },
   methods: {
@@ -175,10 +199,11 @@ export default {
       this.$router.push({ name: 'LoginComponent' });
     },
     async postContent() {
-      if (!this.selectedCategory || !this.content || !this.date) {
+      if (!this.selectedCategory || !this.content || !this.selectedDay || !this.selectedMonth || !this.selectedYear) {
         return;
       }
-      const formattedDate = new Date(this.date).toISOString().split('T')[0];
+
+      const formattedDate = new Date(`${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`).toISOString().split('T')[0];
 
       const post = { content: this.content, date: formattedDate, category: this.selectedCategory };
 
@@ -195,7 +220,9 @@ export default {
           const data = await response.json();
           console.log(data);
           this.content = '';
-          this.date = '';
+          this.selectedDay = '';
+          this.selectedMonth = '';
+          this.selectedYear = '';
           this.showDialog = true;
         } else {
           console.error('Error posting content:', response.statusText);
@@ -204,6 +231,7 @@ export default {
         console.error('Error posting content:', error);
       }
     },
+
     clearDialog() {
       this.showDialog = false;
     }
@@ -215,13 +243,13 @@ export default {
     },
   },
   beforeRouteEnter(to, from, next) {
-      const userType = sessionStorage.getItem('userType');
-      if (userType !== 'admin') {
-        next({ name: 'HomeComponent' });
-      } else {
-        next();
-      }
-    },
+    const userType = sessionStorage.getItem('userType');
+    if (userType !== 'admin') {
+      next({ name: 'HomeComponent' });
+    } else {
+      next();
+    }
+  },
 }
 </script>
 

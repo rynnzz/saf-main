@@ -1,6 +1,6 @@
 <template>
   <header>
-    <img src="~/src/assets/unnamed.png" alt="Logo">
+    <img src="~/src/assets/sticker.jpg" alt="Logo">
     <h1>
       <span style="color: #ea4335;">Cordova</span> <span style="color: #4285f4;">Public College</span>
     </h1>

@@ -6,7 +6,7 @@ img {
 .body,
 .custom-card {
   background-color: #292a2d;
-  height: 100vh;
+  height: 100%;
   margin: 0;
   font-family: 'Product Sans', sans-serif;
   color: white;

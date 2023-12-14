@@ -5,7 +5,7 @@ img {
 
 .body {
   background-color: #292a2d;
-  height: 100vh;
+  height: 100%;
   margin: 0;
   font-family: 'Product Sans', sans-serif;
   color: white;
@@ -60,7 +60,6 @@ img {
   font-family: 'Product Sans', sans-serif;
 }
 
-.date,
 .category {
   padding: 6px 12px;
   background: rgb(31, 32, 35);
@@ -71,5 +70,17 @@ img {
   appearance: none;
   transition: border 0.15s ease 0s;
   margin: 20px;
+  font-family: 'Product Sans Medium', sans-serif;
+}
+.date {
+  margin: 20px;
+  padding: 6px 12px;
+  background: rgb(31, 32, 35);
+  border: 1px solid rgb(60, 63, 68);
+  border-radius: 10px;
+  color: rgb(247, 248, 248);
+  height: 46px;
+  appearance: none;
+  transition: border 0.15s ease 0s;
   font-family: 'Product Sans Medium', sans-serif;
 }
