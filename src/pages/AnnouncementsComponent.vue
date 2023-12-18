@@ -1,25 +1,151 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-header elevated class="header">
+      <q-header
+      elevated
+      class="header"
+      >
+
         <q-toolbar>
-          <img src="~/src/assets/unnamed.png" alt="Logo">
+          <img
+          src="~/src/assets/unnamed.png"
+          alt="Logo"
+          >
+
           <h1>
-            <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
+            <span
+            style="color: #ea4335;"
+            >
+            CPC
+          </span>
+
+          <span
+          style="color: #4285f4;"
+          >
+          Safety Central
+        </span>
           </h1>
-          <div class="row" style="margin-left: 470px;">
-            <router-link to="/ViewProfile"> <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary"
-                icon="person" style="width: 180px; border-radius: 10px; margin-right: 15px;"
-                label="Student" /></router-link>
 
-            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
+          <div
+          class="row"
+          style="margin-left: 400px;"
+          >
 
-            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
+          
+            <q-btn-dropdown
+            v-if="userType === 'user'"
+            v-model="isNotificationDropdownVisible"
+            color="blue"
+            icon="notifications"
+            class="text-white"
+            label="Notifications"
+            style="margin-right: 15px; align-items: center; width: 240px;"
+            >
 
-            <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
-                class="mx-2"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+              <q-list
+              class="notification-dropdown"
+              >
+
+                <q-item
+                v-for="notification in notifications"
+                :key="notification.id"
+                clickable
+                >
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+
+                    <p align="right"
+                    >
+                    {{ notification.category }}
+                  </p>
+
+                    <q-separator
+                    dark
+                    style="margin: 10px;" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+
+
+            <q-btn-dropdown
+            v-if="userType === 'teacher'"
+            v-model="isNotificationDropdownVisible"
+            color="green"
+            icon="notifications"
+            class="text-white"
+            label="Notifications"
+            style="margin-right: 15px; align-items: center; width: 240px;"
+            >
+              <q-list class="notification-dropdown">
+                <q-item v-for="notification in notifications"
+                :key="notification.id"
+                clickable
+                >
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+                    <p align="right">{{ notification.category }}</p>
+                    <q-separator dark style="margin: 10px;" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+
+            <q-btn-dropdown v-if="userType === 'admin'"
+            v-model="isNotificationDropdownVisible"
+            color="purple"
+            icon="notifications"
+            class="text-white"
+            label="Notifications"
+            style="margin-right: 15px; align-items: center; width: 240px;"
+            >
+              <q-list class="notification-dropdown">
+                <q-item v-for="notification in notifications"
+                :key="notification.id"
+                clickable
+                >
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+                    <p align="right">{{ notification.category }}</p>
+                    <p align="right"
+                    v-if="notification.urgent == 1"
+                    style="color: red;"
+                    > Urgent</p>
+                    <q-item-section
+                    side
+                    top
+                    >
+                      <q-badge
+                      v-if="!notification.read"
+                      color="red"
+                      label="New"
+                      />
+                    </q-item-section>
+                    <q-separator
+                    style="margin: 10px;"
+                    />
+
+                  </q-item-section>
+
+                </q-item>
+
+              </q-list>
+
+            </q-btn-dropdown>
+
+
+            <q-btn type="button"
+            class="btn btn-danger"
+            @click="logout"
+            style="width: 180px; border-radius: 30px;"
+            >
+            <i class="mx-2"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd"
                     d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
@@ -27,6 +153,7 @@
                     d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
                 </svg></i>Sign Out</q-btn>
           </div>
+
           <div class="nav-bar" style="margin-left: 70px;">
             <q-tabs>
               <li class="nav-item list-unstyled" style="margin-right: 50px;">
@@ -116,22 +243,73 @@
       </q-header>
 
       <q-page class="body">
-        <div align="center" style="margin: 20px;">
+        <div align="center"
+        style="margin: 20px;"
+        >
           <h2>Announcements</h2>
         </div>
         <div align="center">
-          <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 100%; width: 700px; margin: 50px;">
-            <q-separator dark style="margin: 10px;" />
-            <div>
-              <div v-for="announcement in computedAnnouncements.slice().reverse()" :key="announcement.id">
-                <p style="margin: 15px; font-size: 20px;">{{ announcement.content }}</p><br>
-                <p align="right" style="margin: 10px; font-size: 20px;">Date Posted: {{ announcement.date }}</p>
+          <q-card
+          dark
+          bordered
+          class="bg-grey-10 my-card"
+          align="left"
+          style="height: 100%; width: 700px; margin: 50px;"
+          >
 
-                <q-btn v-if="userType === 'admin'" @click="editAnnouncement(announcement)" color="orange"
-                  style="margin: 20px; align-items: center; border-radius: 15px;">Edit</q-btn>
-                <q-btn v-if="userType === 'admin'" @click="deleteAnnouncement(announcement)" color="danger"
-                  style="align-items: center; border-radius: 15px;">Delete</q-btn>
-                <q-separator dark style="margin: 10px;" />
+            <q-separator
+            dark
+            style="margin: 10px;"
+            />
+
+            <div>
+              <div
+              v-for="announcement in computedAnnouncements.slice().reverse()"
+              :key="announcement.id"
+              >
+                <p
+                style="margin: 15px; font-size: 20px;"
+                >
+                {{ announcement.content }}
+              </p>
+              <br>
+                <p
+                align="right"
+                style="margin: 10px; font-size: 20px;"
+                >
+                Date Posted:
+                {{ announcement.date }}
+              </p>
+
+                <p align="right"
+                v-if="announcement.urgent == 1"
+                style="margin: 10px; font-size: 20px;
+                color: red;"
+                >
+                Urgent
+               </p>
+
+                <q-btn
+                v-if="userType === 'admin'"
+                @click="editAnnouncement(announcement)"
+                color="orange"
+                style="margin: 20px; align-items: center; border-radius: 15px;"
+                >
+                Edit
+              </q-btn>
+
+                <q-btn
+                v-if="userType === 'admin'"
+                @click="deleteAnnouncement(announcement)"
+                color="danger"
+                style="align-items: center; border-radius: 15px;"
+                >
+                Delete
+              </q-btn>
+                <q-separator
+                dark
+                style="margin: 10px;"
+                />
               </div>
             </div>
           </q-card>
@@ -139,39 +317,100 @@
       </q-page>
     </q-page-container>
   </q-layout>
-  <q-dialog v-model="isDeleteConfirmationModalVisible" persistent>
-    <q-card class="custom-card" style="width: 100vw">
+  <q-dialog
+  v-model="isDeleteConfirmationModalVisible"
+  persistent
+  >
+
+    <q-card
+    class="custom-card"
+    style="width: 100vw"
+    >
       <q-card-section>
-        <h2 class="text-h6">Confirm Deletion</h2>
+        <h2
+        class="text-h6"
+        >
+        Confirm Deletion
+      </h2>
       </q-card-section>
 
       <q-card-section>
         <p>Are you sure you want to delete this announcement?</p>
       </q-card-section>
 
-      <q-card-actions align="right" style="margin: 20px;">
-        <q-btn color="primary" @click="cancelDelete"
-          style="align-items: center; margin-right: 10px; border-radius: 15px;"> Cancel </q-btn>
-        <q-btn color="negative" @click="confirmDelete" style="align-items: center; border-radius: 15px;"> Delete </q-btn>
+      <q-card-actions
+      align="right"
+      style="margin: 20px;"
+      >
+
+        <q-btn
+        color="primary"
+        @click="cancelDelete"
+        style="align-items: center; margin-right: 10px; border-radius: 15px;"
+        >
+        Cancel
+      </q-btn>
+
+        <q-btn
+        color="negative"
+        @click="confirmDelete"
+        style="align-items: center; border-radius: 15px;"
+        >
+        Delete
+      </q-btn>
+
       </q-card-actions>
+
     </q-card>
+
   </q-dialog>
-  <q-dialog v-model="isEditModalVisible" persistent>
-    <q-card class="custom-card" style="width: 300vw;">
+  <q-dialog
+  v-model="isEditModalVisible"
+  persistent
+  >
+
+    <q-card
+    class="custom-card"
+    style="width: 300vw;"
+    >
+
       <q-card-section>
         <h2 class="text-h6">Edit Announcement</h2>
       </q-card-section>
 
       <q-card-section>
-        <textarea v-model="editedAnnouncement.content" placeholder="Announcement" class="compose"> </textarea>
-        <input type="date" v-model="editedAnnouncement.date" class="date" />
+        <textarea
+        v-model="editedAnnouncement.content"
+        placeholder="Announcement"
+        class="compose"
+        />
+
+        <input type="date"
+        v-model="editedAnnouncement.date"
+        class="date"
+        />
+
       </q-card-section>
 
-      <q-card-actions align="right" style="margin: 20px;">
-        <q-btn label="Cancel" color="primary" @click="cancelEdit"
-          style="align-items: center; margin-right: 10px; border-radius: 15px;" />
-        <q-btn label="Save Changes" color="positive" @click="saveChanges"
-          style="align-items: center; width: 160px; border-radius: 15px;" />
+      <q-card-actions
+      align="right"
+      style="margin: 20px;"
+      >
+
+        <q-btn
+        label="Cancel"
+        color="primary"
+        @click="cancelEdit"
+        style="align-items: center; margin-right: 10px; border-radius: 15px;"
+        />
+
+        <q-btn
+        label="Save Changes"
+        color="positive"
+        @click="saveChanges"
+        style="align-items: center; width: 160px; border-radius: 15px;"
+        />
+
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -188,6 +427,9 @@ export default {
       activeTab: 'AnnouncementsComponent',
       isDeleteConfirmationModalVisible: false,
       announcements: [],
+      notifications: [],
+      notificationCount: 0,
+      isNotificationDropdownVisible: false,
       isEditModalVisible: false,
       announcementToDeleteId: null,
       editedAnnouncement: {
@@ -204,6 +446,9 @@ export default {
     setActiveTab(AnnouncementsComponent) {
       this.activeTab = AnnouncementsComponent
     },
+    toggleNotificationDropdown() {
+      this.isNotificationDropdownVisible = !this.isNotificationDropdownVisible;
+    },
     logout() {
       simulateLogout()
       this.$router.push({ name: 'LoginComponent' });
@@ -217,13 +462,23 @@ export default {
         }
 
         const data = await response.json();
-        console.log('API Response:', data);
         this.announcements = data;
+        this.notifications = data.map(announcement => ({
+          id: announcement.id,
+          content: announcement.content,
+          category: announcement.category,
+          date: announcement.date,
+          urgent: announcement.urgent,
+          read: false,
+        }));
+
+        const newAnnouncementCount = data.length - this.notificationCount;
+        this.notificationCount += newAnnouncementCount;
+
       } catch (error) {
         console.error('Error fetching announcements', error);
       }
     },
-
     deleteAnnouncement(announcement) {
       this.announcementToDeleteId = announcement.id;
       this.isDeleteConfirmationModalVisible = true;
@@ -342,7 +597,9 @@ export default {
       return sessionStorage.getItem('userType')
     },
     computedAnnouncements() {
-      return this.announcements.map(announcement => {
+      const sortedAnnouncements = this.announcements.slice().sort((a, b) => b.urgent - a.urgent);
+
+      return sortedAnnouncements.map(announcement => {
         const formattedDate = new Date(announcement.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
@@ -353,9 +610,8 @@ export default {
           ...announcement,
           date: formattedDate,
         };
-      }).slice().reverse();
+      }).slice().reverse()
     },
-
   },
 }
 

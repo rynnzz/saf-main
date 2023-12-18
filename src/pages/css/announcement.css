@@ -12,6 +12,13 @@ img {
   display: flex;
   flex-direction: column;
 }
+.notification-dropdown {
+  height: 100%;
+  width: 600px;
+  margin: 20px;
+  font-family: 'Product Sans Medium', sans-serif;
+
+}
 
 .header {
   background-color: #1f1f1f;

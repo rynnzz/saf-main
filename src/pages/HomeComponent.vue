@@ -2,21 +2,21 @@
   <q-layout>
     <q-page-container>
       <q-header elevated class="header">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <q-toolbar>
           <img src="~/src/assets/unnamed.png" alt="Logo">
           <h1>
             <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
           </h1>
-          <div class="row" style="margin-left: 470px;">
-            <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
+          <div class="row" style="margin-left: 590px;">
 
-            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
+            <q-btn type="button" v-if="userType === 'user'" color="blue" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
 
-            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
+            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
 
             <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
                 class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -147,6 +147,9 @@
                 <p style="margin: 15px; font-size: 20px;">{{ event.content }}</p>
                 <p align="right" style="margin: 10px; font-size: 20px;">{{ event.date }}</p>
 
+                <p align="right" v-if="event.urgent == 1" style="margin: 10px; font-size: 20px; color: red;">
+                  Urgent</p>
+
                 <q-btn v-if="userType === 'admin'" @click="editEvent(event)" color="orange"
                   style="margin: 20px; align-items: center;">Edit</q-btn>
                 <q-btn v-if="userType === 'admin'" @click="deleteEvent(event)" color="danger"
@@ -217,7 +220,7 @@ export default {
     }
   },
   created() {
-    this.getEvents()
+    this.getEvents();
   },
   methods: {
     setActiveTab(HomeComponent) {
@@ -242,6 +245,7 @@ export default {
         console.error('Error fetching Events', error);
       }
     },
+
 
 
     deleteEvent(event) {
@@ -370,7 +374,9 @@ export default {
       return sessionStorage.getItem('userType')
     },
     computedEvents() {
-      return this.events.map(event => {
+      const sortedEvents = this.events.slice().sort((a, b) => b.urgent - a.urgent);
+
+      return sortedEvents.map(event => {
         const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',

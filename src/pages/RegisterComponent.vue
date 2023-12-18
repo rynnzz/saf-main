@@ -259,7 +259,6 @@ export default {
       const birth = new Date(birthDate);
       let age = today.getFullYear() - birth.getFullYear();
 
-      // Check if the birthday has occurred this year
       if (
         today.getMonth() < birth.getMonth() ||
         (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())
@@ -267,7 +266,6 @@ export default {
         age--;
       }
 
-      // Update the 'age' property
       this.age = age;
     },
     updateBDate() {

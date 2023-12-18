@@ -7,9 +7,17 @@
           <h1>
             <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
           </h1>
-          <div class="row" style="margin-left: 470px;">
-            <q-btn type="button" color="purple" icon="person"
-              style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Admin" />
+          <div class="row" style="margin-left: 590px;">
+
+            <q-btn type="button" v-if="userType === 'user'" color="blue" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
             <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
                 class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
@@ -111,28 +119,33 @@
               <textarea v-model="content" class="compose" placeholder="Compose Announcement/Schedules/Events"></textarea>
             </q-card-section>
             <div>
-            <select v-model="selectedCategory" class="category">
-              <option value="" selected disabled>Category</option>
-              <option value="Announcement">Announcements</option>
-              <option value="Schedule">Schedules</option>
-              <option value="Event">Events</option>
-              <option value="Contacts">Contacts</option>
+              <select v-model="selectedCategory" class="category">
+                <option value="" selected disabled>Category</option>
+                <option value="Announcement">Announcements</option>
+                <option value="Schedule">Schedules</option>
+                <option value="Event">Events</option>
+                <option value="Contacts">Contacts</option>
+              </select>
 
-            </select>
-            <br>
-            <q-separator dark style="margin: 20px;" />
-            <select v-model="selectedMonth" class="date" style="margin-right: 15px;">
-              <option value="" selected disabled>Month</option>
-              <option v-for="(month, index) in months" :key="index + 1" :value="index + 1">{{ month }}</option>
-            </select>
-            <select v-model="selectedDay" class="date" style="margin-right: 15px;">
-              <option value="" selected disabled>Day</option>
-              <option v-for="day in days" :key="day" :value="day">{{ day }}</option>
-            </select>
-            <select v-model="selectedYear" class="date" style="margin-right: 15px;">
-              <option value="" selected disabled>Year</option>
-              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-            </select>
+
+              <label for="urgent" class="urgent-label" style="margin-right: 10px;">Urgent:</label>
+              <input type="checkbox" id="urgent" v-model="urgent" class="urgent-checkbox">
+
+
+              <br>
+              <q-separator dark style="margin: 20px;" />
+              <select v-model="selectedMonth" class="date" style="margin-right: 15px;">
+                <option value="" selected disabled>Month</option>
+                <option v-for="(month, index) in months" :key="index + 1" :value="index + 1">{{ month }}</option>
+              </select>
+              <select v-model="selectedDay" class="date" style="margin-right: 15px;">
+                <option value="" selected disabled>Day</option>
+                <option v-for="day in days" :key="day" :value="day">{{ day }}</option>
+              </select>
+              <select v-model="selectedYear" class="date" style="margin-right: 15px;">
+                <option value="" selected disabled>Year</option>
+                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+              </select>
             </div>
           </q-card>
           <q-btn @click="postContent" color="blue"
@@ -178,6 +191,7 @@ export default {
       content: '',
       date: '',
       selectedCategory: '',
+      urgent: false,
       showDialog: false,
       selectedDay: '',
       selectedMonth: '',
@@ -205,7 +219,12 @@ export default {
 
       const formattedDate = new Date(`${this.selectedYear}-${this.selectedMonth}-${this.selectedDay}`).toISOString().split('T')[0];
 
-      const post = { content: this.content, date: formattedDate, category: this.selectedCategory };
+      const post = {
+        content: this.content,
+        date: formattedDate,
+        category: this.selectedCategory,
+        urgent: this.urgent,
+      };
 
       try {
         const response = await fetch('http://localhost/api/compose.php', {
@@ -223,7 +242,10 @@ export default {
           this.selectedDay = '';
           this.selectedMonth = '';
           this.selectedYear = '';
+          this.urgent = false;
           this.showDialog = true;
+
+
         } else {
           console.error('Error posting content:', response.statusText);
         }

@@ -7,15 +7,17 @@
           <h1>
             <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
           </h1>
-          <div class="row" style="margin-left: 470px;">
-            <q-btn type="button" v-if="userType === 'user'" class="btn btn-primary" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Student" />
+          <div class="row" style="margin-left: 590px;">
 
-            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
+            <q-btn type="button" v-if="userType === 'user'" color="blue" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
 
-            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
-              style="width: 180px; border-radius: 10px; margin-right: 15px;" label="Admin" />
+            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
 
             <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
                 class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -125,6 +127,8 @@
               <div v-for="schedule in computedSchedules.slice().reverse()" :key="schedule.id">
                 <p style="margin: 15px; font-size: 20px;">{{ schedule.content }}</p>
                 <p align="right" style="margin: 10px; font-size: 20px;">Date Posted: {{ schedule.date }}</p>
+                <p align="right" v-if="schedule.urgent == 1" style="margin: 10px; font-size: 20px; color: red;">
+                  Urgent</p>
 
                 <q-btn v-if="userType === 'admin'" @click="editSchedule(schedule)" color="orange"
                   style="margin: 20px; align-items: center;">Edit</q-btn>
@@ -328,7 +332,9 @@ export default {
       return sessionStorage.getItem('userType')
     },
     computedSchedules() {
-      return this.schedules.map(schedule => {
+      const sortedSchedules = this.schedules.slice().sort((a, b) => b.urgent - a.urgent);
+
+      return sortedSchedules.map(schedule => {
         const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',

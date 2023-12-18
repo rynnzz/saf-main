@@ -7,12 +7,17 @@
           <h1>
             <span style="color: #ea4335;">CPC</span> <span style="color: #4285f4;">Safety Central</span>
           </h1>
-          <div class="row" style="margin-left: 470px;">
-            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="person"
-              style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Teacher" />
+          <div class="row" style="margin-left: 590px;">
 
-            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="person"
-              style="width: 170px; border-radius: 10px; margin-right: 15px;" label="Admin" />
+            <q-btn type="button" v-if="userType === 'user'" color="blue" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
+            <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="notifications"
+              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+
             <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;"><i
                 class="mx-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-box-arrow-right" viewBox="0 0 16 16">
@@ -298,13 +303,13 @@ export default {
     },
   },
   beforeRouteEnter(to, from, next) {
-      const userType = sessionStorage.getItem('userType');
-      if (userType !== 'admin' && userType !== 'teacher') {
-        next({ name: 'HomeComponent' });
-      } else {
-        next();
-      }
-    },
+    const userType = sessionStorage.getItem('userType');
+    if (userType !== 'admin' && userType !== 'teacher') {
+      next({ name: 'HomeComponent' });
+    } else {
+      next();
+    }
+  },
 }
 </script>
 

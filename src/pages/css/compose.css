@@ -25,6 +25,15 @@ img {
   font-family: 'Product Sans Black', sans-serif;
 }
 
+.urgent-label {
+  font-family: 'Product Sans Medium', sans-serif;
+  margin-bottom: 10px;
+}
+
+.urgent-checkbox {
+  margin-bottom: 10px;
+}
+
 .nav-bar {
   font-family: 'Product Sans Medium', sans-serif;
 }
