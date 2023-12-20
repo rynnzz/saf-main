@@ -16,17 +16,82 @@
             </span>
           </h1>
 
-          <div class="row" style="margin-left: 590px;">
+          <div class="row" style="margin-left: 390px;">
 
-            <q-btn type="button" @click="showNotifications" v-if="userType === 'user'" color="blue" icon="notifications"
-              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+            <q-badge v-if="notificationCount > 0" color="red" style="border-radius: 50%;"> {{ notificationCount
+            }}</q-badge>
+            <q-btn-dropdown v-if="userType === 'user'" v-model="isNotificationDropdownVisible" color="blue"
+              icon="notifications" class="text-white" label="Notifications"
+              style="margin-right: 15px; align-items: center; width: 240px;">
+              <q-list class="notification-dropdown">
+                <q-item v-for="notification in notifications" :key="notification.id" clickable
+                  @click="scrollToNotification(notification)" ref="notificationItem">
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+                    <p align="right">{{ notification.category }}</p>
+                    <p align="right" v-if="notification.urgent == 1" style="color: red;"> Urgent</p>
+                    <q-item-section side top>
+                      <q-badge v-if="!notification.read" color="red" label="New" />
+                    </q-item-section>
+                    <q-separator style="margin: 10px;" />
+                  </q-item-section>s
+
+                </q-item>
+
+              </q-list>
+
+            </q-btn-dropdown>
 
 
-              <q-btn type="button" v-if="userType === 'teacher'" color="green" icon="notifications"
-              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+            <q-btn-dropdown v-if="userType === 'teacher'" v-model="isNotificationDropdownVisible" color="green"
+              icon="notifications" class="text-white" label="Notifications"
+              style="margin-right: 15px; align-items: center; width: 240px;">
+              <q-list class="notification-dropdown">
+                <q-item v-for="notification in notifications" :key="notification.id" clickable>
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+                    <p align="right">{{ notification.category }}</p>
+                    <p align="right" v-if="notification.urgent == 1" style="color: red;"> Urgent</p>
+                    <q-item-section side top>
+                      <q-badge v-if="!notification.read" color="red" label="New" />
+                    </q-item-section>
+                    <q-separator style="margin: 10px;" />
 
-              <q-btn type="button" v-if="userType === 'admin'" color="purple" icon="notifications"
-              style="border-radius: 100%; margin-right: 15px; align-items: center;" />
+                  </q-item-section>
+
+                </q-item>
+
+              </q-list>
+
+            </q-btn-dropdown>
+
+            <q-btn-dropdown v-if="userType === 'admin'" v-model="isNotificationDropdownVisible" color="purple"
+              icon="notifications" class="text-white" label="Notifications"
+              style="margin-right: 15px; align-items: center; width: 240px;">
+              <q-list class="notification-dropdown">
+                <q-item v-for="notification in notifications" :key="notification.id" clickable>
+                  <q-item-section>
+                    {{ notification.content }}
+                    <br>
+                    <br>
+                    <p align="right">{{ notification.category }}</p>
+                    <p align="right" v-if="notification.urgent == 1" style="color: red;"> Urgent</p>
+                    <q-item-section side top>
+                      <q-badge v-if="!notification.read" color="red" label="New" />
+                    </q-item-section>
+                    <q-separator style="margin: 10px;" />
+
+                  </q-item-section>
+
+                </q-item>
+
+              </q-list>
+
+            </q-btn-dropdown>
 
 
             <q-btn type="button" class="btn btn-danger" @click="logout" style="width: 180px; border-radius: 30px;">
@@ -224,10 +289,6 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-  <div v-if="showNotification">
-      <!-- Your notification content goes here -->
-      Notifications content goes here.
-    </div>
 </template>
 
 <script>
@@ -241,7 +302,8 @@ export default {
       activeTab: 'AnnouncementsComponent',
       isDeleteConfirmationModalVisible: false,
       announcements: [],
-      showNotification: false,
+      notifications: [],
+      notificationCount: 0,
       isNotificationDropdownVisible: false,
       isEditModalVisible: false,
       announcementToDeleteId: null,
@@ -256,14 +318,51 @@ export default {
   },
   created() {
     this.getAnnouncements();
+    this.initializeNotifications();
   },
   methods: {
-    showNotifications() {
-      // Toggle the showNotification state on button click
-      this.showNotification = !this.showNotification;
-    },
     setActiveTab(AnnouncementsComponent) {
       this.activeTab = AnnouncementsComponent
+    },
+    toggleNotificationDropdown() {
+      this.isNotificationDropdownVisible = !this.isNotificationDropdownVisible;
+    },
+    initializeNotifications() {
+      this.notifications = this.announcements
+        .filter(announcement => announcement.urgent === 1)
+        .map(announcement => ({
+          id: announcement.id,
+          content: announcement.content,
+          category: announcement.category,
+          date: announcement.date,
+          urgent: announcement.urgent,
+          read: false,
+        }));
+
+      this.notificationCount = this.notifications.length;
+    },
+
+
+    scrollToNotification(notification) {
+      console.log('Clicked notification:', notification);
+
+      // Assuming you have a reference to the notification element
+      const notificationElement = this.$refs.notificationItem.find(item => item.id === notification.id);
+
+      // Check if the element is found
+      if (notificationElement) {
+        // Use a smooth scroll to the notification element
+        notificationElement.$el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start', // Adjust this value based on your layout
+        });
+
+        // Mark the notification as read (if needed)
+        notification.read = true;
+
+        // Reset the notification count
+        this.notificationCount = 0;
+      }
     },
 
     logout() {
@@ -289,6 +388,8 @@ export default {
           read: false,
         }));
 
+        const newAnnouncementCount = data.length - this.notificationCount;
+        this.notificationCount += newAnnouncementCount;
 
       } catch (error) {
         console.error('Error fetching announcements', error);
