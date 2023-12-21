@@ -121,7 +121,7 @@ export default {
       passwordMatchError: '',
       errorMessage: '',
       birthDay: today.getDate(),
-      birthMonth: today.getMonth() + 1, // Months are zero-indexed, so add 1
+      birthMonth: today.getMonth() + 1,
       birthYear: today.getFullYear(),
       days: Array.from({ length: 31 }, (_, i) => i + 1),
       months: [
@@ -144,7 +144,6 @@ export default {
     }
   },
   watch: {
-    // Watch for changes in the 'b_date' properties
     birthDay() {
       this.updateBDate();
     },

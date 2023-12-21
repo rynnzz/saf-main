@@ -244,8 +244,6 @@ export default {
           this.selectedYear = '';
           this.urgent = false;
           this.showDialog = true;
-
-
         } else {
           console.error('Error posting content:', response.statusText);
         }

@@ -117,7 +117,7 @@
       </q-header>
 
       <q-page class="body">
-        <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 600px; width: 700px">
+        <q-card dark bordered class="bg-grey-10 my-card" align="left" style="height: 100%; width: 700px">
           <q-card-section>
             <h2>My Profile</h2>
           </q-card-section>
@@ -134,6 +134,7 @@
               <p>Contact Person's Phone Number: {{ userData.g_cnum }}</p>
               <p>Student's Phone Number: {{ userData.s_cnum }}</p>
               <p>Status: {{ userData.status }}</p>
+              <q-btn type="button" class="btn btn-primary" @click="editInfo" style="width: 160px;" label="Edit Profile"></q-btn>
             </div>
           </q-card-section>
         </q-card>
@@ -162,6 +163,9 @@ export default {
       simulateLogout()
       this.$router.push({ name: 'LoginComponent' })
     },
+    editInfo() {
+
+    }
   },
 
   computed: {

@@ -130,7 +130,7 @@
                   label="View Details" @click="viewDetails(user)" />
               </td>
               <td v-if="userType === 'admin'">
-                <select v-model="user.status" id="status"
+                <select v-model="user.status"
                   style="width: 250px; background: rgb(31, 32, 35); border: 1px solid rgb(60, 63, 68); border-radius: 10px; color: rgb(247, 248, 248); height: 46px;">
                   <option value="" selected disabled>Status</option>
                   <option value="Enrolled">Enrolled</option>
@@ -211,7 +211,7 @@ export default {
       status: '',
       user: {
         id_num: '',
-        status: 'Enrolled'
+        status: ''
       }
     };
   },
@@ -252,7 +252,7 @@ export default {
 
     closeViewDetailsModal() {
       this.viewDetailsModal = false;
-      this.selectedStudent = {};
+      this.selectedStudent = [];
     },
     async fetchUsers() {
       try {
@@ -260,7 +260,7 @@ export default {
         if (response.data.success) {
           this.users = response.data.data.map(user => {
             if (!user.status) {
-              user.status = 'Enrolled';
+              user.status = '';
             }
             return user;
           });

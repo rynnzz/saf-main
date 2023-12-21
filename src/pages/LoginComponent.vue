@@ -61,7 +61,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     if (checkIfUserIsAuthenticated()) {
-      const userType = localStorage.getItem('userType')
+      const userType = sessionStorage.getItem('userType')
       if (userType === 'admin') {
         next({ name: 'HomeComponent' })
       } else {

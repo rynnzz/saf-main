@@ -232,7 +232,7 @@ export default {
     },
     async getEvents() {
       try {
-        const response = await fetch('http://localhost/api/event.php?action=getEvents');
+        const response = await fetch('http://192.168.1.11/api/event.php?action=getEvents');
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -259,7 +259,7 @@ export default {
     async confirmDelete() {
       try {
         console.log('Deleting event with ID:', this.eventToDeleteId);
-        const response = await fetch('http://localhost/api/event.php', {
+        const response = await fetch('http://192.168.1.11/api/event.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -309,7 +309,7 @@ export default {
       const editedDate = new Date(this.editedEvent.date);
       const formattedDate = `${editedDate.getFullYear()}-${(editedDate.getMonth() + 1).toString().padStart(2, '0')}-${editedDate.getDate().toString().padStart(2, '0')}`;
       try {
-        const response = await fetch('http://localhost/api/event.php', {
+        const response = await fetch('http://192.168.1.11/api/event.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -362,7 +362,7 @@ export default {
           return userObject.username;
         }
         else if (userType === 'teacher') {
-          return userObject.username;
+          return userObject.fname;
         } else {
           return userObject.fname;
         }

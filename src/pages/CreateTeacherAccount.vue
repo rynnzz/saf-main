@@ -110,7 +110,13 @@
           <h2 class="q-mb-md" align="center" style="margin: 40px;">Create Teacher Account</h2>
           <q-form @submit="register" class="q-gutter-md">
             <div v-if="registrationError" class="text-negative" align="center">{{ registrationError }}</div>
-            <input v-model="username" type="text" id="username" class="username" name="username"
+            <input v-model="fname" type="text" id="fname" class="username" name="fname"
+              placeholder="First Name"><br><br>
+              <input v-model="mname" type="text" id="mname" class="username" name="mname"
+              placeholder="Middle Name"><br><br>
+              <input v-model="lname" type="text" id="lname" class="username" name="lname"
+              placeholder="Last Name"><br><br>
+              <input v-model="username" type="text" id="username" class="username" name="username"
               placeholder="Username"><br><br>
             <input v-model="password" type="password" id="password" class="password" name="password"
               placeholder="Password"><br><br>
@@ -144,6 +150,9 @@ export default {
   data() {
     return {
       activeTab: 'CreateTeacherAccount',
+      fname: '',
+      mname: '',
+      lname: '',
       username: '',
       password: '',
       registrationSuccess: false,
@@ -167,7 +176,6 @@ export default {
     },
     async register() {
       try {
-        // Check if username or password is not provided
         if (!this.username || !this.password) {
           throw new Error('Username and password are required.');
         }
@@ -178,6 +186,9 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            fname: this.fname,
+            mname: this.mname,
+            lname: this.lname,
             username: this.username,
             password: this.password,
           })
